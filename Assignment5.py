@@ -6,7 +6,10 @@
 
 
 # Any imports needed go under here
-
+import heapq
+import time
+import psutil
+import os
 
 # Board class that stores the game board (state)
 class State:
@@ -80,15 +83,32 @@ class State:
             newState[self.emptySpaceIdx] = temp
             # create the child
             return State(newState)
-
+    
+    # heuristic function for misplace tiles
+    def heuristic_misplaced(self):
+        misplaced = 0
+        compareTo = ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','0']
+        for i in range(len(self.grid)):
+            if self.grid[i] != compareTo[i]:
+                misplaced+=1
+        return misplaced
+    
+    # heuristic function for manhattan distance
+    def heuristic_manhattan(self):
+        distance = 0
+        compareTo = ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','0']
+        # do more
+        
+    
 # Node class that stores information of nodes
 class Node:
     
     # constructor
-    def __init__(self, state, parent, action):
+    def __init__(self, state, parent, action, path_cost):
         self.state = state
         self.parent = parent
         self.action = action
+        self.path_cost = path_cost
         self.children = []
     
     # return a string representation of the state
@@ -133,6 +153,23 @@ def goal_test(grid):
     return grid == ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','0']
 
 # main a star search function
+def astar_search(initialNode, h=None):
+    start_time = time.time()
+    frontier = [initialNode]
+    heapq.heapify(frontier)
+    explored = set()
+    while(len(frontier)>0):
+        curr = heapq.heappop()
+        explored.add(curr)
+        if goal_test(curr.state.grid):
+            path = backtrack(curr)
+            end_time = time.time()
+            return "Success"
+        children = curr.add_children()
+        for child in children:
+            if child not in frontier and child not in explored:
+                heapq.heappush(frontier,child)
+    return "Failure"
 
 
 # main function
@@ -140,7 +177,12 @@ def main():
     board = str(input("Enter initial board: "))
     initial_list = board.split(" ")
     root = Node(State(initial_list), None, None)
-    print
+    print("Moves: " + " ")
+    print("Number of expanded Nodes: ")
+    print("Time taken: ")
+    print("Total memory used: ")
+    
+    
 # run main
 if __name__ == '__main__':
     main()
